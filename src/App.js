@@ -12,7 +12,9 @@ function App() {
     if (!title || !date) return;
 
     const newTask = { id: Date.now(), title, date };
-    setTasks([...tasks, newTask]);
+    const updatedTasks = [...tasks, newTask].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    setTasks(updatedTasks);
     setTitle('');
     setDate('');
   };
