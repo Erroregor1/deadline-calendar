@@ -31,11 +31,15 @@ function App() {
       </form>
 
       <ul>
-        {tasks.map(task => (
-          <li key={task.id}>
-            <strong>{task.title}</strong> — {task.date}
-          </li>
-        ))}
+        {tasks.map(task => {
+          const isExpired = new Date(task.date) < new Date(today);
+          return (
+            <li key={task.id} className={isExpired ? 'expired' : ''}>
+              <strong>{task.title}</strong> — {task.date}
+              {isExpired && <span> (ПРОСРОЧЕНО)</span>}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
