@@ -5,19 +5,35 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
+  const [filter, setFilter] = useState('all');
+
   const today = new Date().toISOString().split('T')[0];
+
+  const formatDate = (dateStr) => {
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return new Date(dateStr).toLocaleDateString('ru-RU', options);
+  };
 
   const addTask = (e) => {
     e.preventDefault();
     if (!title || !date) return;
-
     const newTask = { id: Date.now(), title, date };
     const updatedTasks = [...tasks, newTask].sort((a, b) => new Date(a.date) - new Date(b.date));
-    
     setTasks(updatedTasks);
     setTitle('');
     setDate('');
   };
+
+  const filteredTasks = tasks.filter(task => {
+    const taskDate = new Date(task.date);
+    const now = new Date(today);
+    const nextWeek = new Date();
+    nextWeek.setDate(now.getDate() + 7);
+
+    if (filter === 'overdue') return taskDate < now;
+    if (filter === 'week') return taskDate >= now && taskDate <= nextWeek;
+    return true; 
+  });
 
   return (
     <div className="container">
@@ -30,12 +46,19 @@ function App() {
         <button type="submit">Добавить</button>
       </form>
 
-      <ul>
-        {tasks.map(task => {
+      <div className="filters">
+        <button onClick={() => setFilter('all')}>Все</button>
+        <button onClick={() => setFilter('week')}>На этой неделе</button>
+        <button onClick={() => setFilter('overdue')}>Просроченные</button>
+      </div>
+
+<ul>
+        {filteredTasks.map(task => {
           const isExpired = new Date(task.date) < new Date(today);
           return (
             <li key={task.id} className={isExpired ? 'expired' : ''}>
-              <strong>{task.title}</strong> — {task.date}
+              {/* Используем нашу функцию formatDate здесь */}
+              <strong>{task.title}</strong> — {formatDate(task.date)}
               {isExpired && <span> (ПРОСРОЧЕНО)</span>}
             </li>
           );
